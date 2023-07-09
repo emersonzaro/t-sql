@@ -4,7 +4,7 @@ e SQL Server Management Studio (SSMS)
 
 📝 Download do SQL Server 2022 Developer: [SQL Server 2022 Developer](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads)
 
-📝 Download do SQL Server Management Studio (SSMS): [SQL Server Management Studio (SSMS) ][https://www.microsoft.com/pt-br/sql-server/sql-server-downloads](https://aka.ms/ssmsfullsetup)
+📝 Download do SQL Server Management Studio (SSMS): [SQL Server Management Studio (SSMS)](https://aka.ms/ssmsfullsetup)
 
 --
 
