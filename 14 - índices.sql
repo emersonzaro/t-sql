@@ -1,0 +1,22 @@
+
+ CREATE TABLE dbo.TesteIndex
+ (
+	CPF VARCHAR(11) NOT NULL,
+	NOME VARCHAR(50) NULL,
+	RG VARCHAR(10)
+ );
+
+
+ CREATE UNIQUE CLUSTERED INDEX IX_CPF
+ ON dbo.TesteIndex (CPF)
+
+
+ CREATE  NONCLUSTERED INDEX IX_RG_NOME
+ ON dbo.TesteIndex (RG, Nome)
+
+ EXEC sp_helpindex TesteIndex
+
+
+ DROP INDEX dbo.TesteIndex.IX_RG
+
+

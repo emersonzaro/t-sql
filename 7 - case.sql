@@ -1,0 +1,13 @@
+
+SELECT NumeroPedido,
+       SUM(Preco) AS 'TOTAL VENDAS',
+		CASE
+			WHEN SUM(Preco) >= 50
+				THEN 'META ATIGINDA' 
+			WHEN SUM(Preco) >= 20 AND SUM(Preco) < 50
+				THEN 'MEDIANO'
+			ELSE
+				'NÃO ATINGIDA'
+		END AS 'STATUS'
+	   FROM TB_DETALHE_PEDIDO
+GROUP BY NumeroPedido
