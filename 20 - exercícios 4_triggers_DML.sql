@@ -1,0 +1,154 @@
+
+/**
+Uma trigger é um tipo de stored procedure que é automaticamente disparada quam há um evento, como uma alteração nos dados de uma tabela por exemplo.
+
+Tem 3 tipos: Triggers DML (Data Manipulation Language) - INSERT, DELETE, UPDATE
+			 Triggers DDL (Data Definition Language) - ALTER, DROP, CREAT
+			 Triggers de Logon
+**/
+
+CREATE TABLE TB_HIST_SALARIO
+(
+	FuncionarioId INT PRIMARY KEY,
+	Data_alteracao DATETIME2 DEFAULT GETDATE(),
+	Salario_Antigo MONEY,
+	Salario_Novo MONEY,
+	CONSTRAINT FK_TB_HIST_SALARIO_FUNCIONARIO FOREIGN KEY (FuncionarioId)
+	REFERENCES TB_Funcionario(FuncionarioId)
+);
+
+CREATE TRIGGER TRG_FUNCIONARIOS_HIST_SALARIO ON TB_FUNCIONARIO
+FOR UPDATE
+AS BEGIN
+	DECLARE @FUNCIONARIO_ID INT, @SALARIO_ANTIGO MONEY, @SALARIO_NOVO MONEY;
+
+	SELECT  @SALARIO_ANTIGO = Salario FROM deleted;
+
+	SELECT  @FUNCIONARIO_ID = FuncionarioId  ,@SALARIO_NOVO = Salario FROM inserted;
+
+	IF @SALARIO_ANTIGO <> @SALARIO_NOVO
+		BEGIN
+			INSERT INTO TB_HIST_SALARIO
+			(FuncionarioId, Salario_Antigo, Salario_Novo)
+			VALUES
+			(@FUNCIONARIO_ID, @SALARIO_ANTIGO, @SALARIO_NOVO)
+		END
+END
+
+UPDATE TB_FUNCIONARIO
+SET Salario = 6500
+WHERE FuncionarioId = 1
+
+SELECT * FROM TB_HIST_SALARIO
+
+
+-- EXEMPLO 2
+
+SELECT * FROM TB_PEDIDO
+
+ALTER TABLE TB_PEDIDO
+ADD ValorTotal MONEY DEFAULT 0
+
+CREATE TRIGGER TRG_CORRIGE_VLR_TOTAL ON TB_DETALHE_PEDIDO
+FOR DELETE, INSERT, UPDATE
+AS BEGIN
+	-- SE FOR DELETE
+	IF NOT EXISTS (SELECT * FROM inserted)
+	BEGIN
+		UPDATE TB_PEDIDO
+		SET VALORTOTAL = (SELECT  SUM(D.Preco * D.Quantidade)  FROM  TB_DETALHE_PEDIDO D
+							WHERE P.NumeroPedido = D.NumeroPedido)
+							FROM TB_PEDIDO P JOIN deleted
+							ON P.NumeroPedido = deleted.NumeroPedido
+
+	END
+
+	-- SE FOR UPDATE OU INSERT
+	ELSE
+	BEGIN
+		UPDATE TB_PEDIDO
+		SET VALORTOTAL = (SELECT  SUM(D.Preco * D.Quantidade)  FROM  TB_DETALHE_PEDIDO D
+							WHERE P.NumeroPedido = D.NumeroPedido)
+							FROM TB_PEDIDO P JOIN inserted
+							ON P.NumeroPedido = inserted.NumeroPedido
+	END
+END
+
+
+SELECT * FROM TB_PEDIDO WHERE NumeroPedido = 10249
+
+SELECT * FROM TB_DETALHE_PEDIDO WHERE NumeroPedido = 10249
+
+UPDATE TB_DETALHE_PEDIDO
+SET Quantidade = 11
+WHERE NumeroPedido = 10249 AND ProdutoId = 14
+
+
+-- EXEMPLO 3
+
+SELECT * FROM TB_CLIENTE
+
+ALTER TABLE TB_CLIENTE
+ADD Ativo BIT DEFAULT 1
+
+UPDATE TB_CLIENTE
+SET Ativo = 1
+
+GO
+CREATE TRIGGER TRG_DESATIVA_CLIENTE ON TB_CLIENTE
+INSTEAD OF DELETE
+AS BEGIN
+	UPDATE TB_CLIENTE SET Ativo = 0
+	FROM TB_CLIENTE C JOIN deleted D 
+	ON C.ClienteId = D.ClienteId
+END
+
+SELECT * FROM TB_CLIENTE WHERE ClienteId = 'ALFKI'
+
+DELETE TB_CLIENTE WHERE ClienteId = 'ALFKI'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
